@@ -7,11 +7,11 @@ export class ClientConfigService {
   constructor(private configService: ConfigService) {}
 
   getBooksServicePort(): number {
-    return this.configService.get<number>('BOOKS_CLIENT_PORT') as number;
+    return this.configService.get<number>('BOOKS_CLIENT_PORT', 3003);
   }
 
   getUsersServicePort(): number {
-    return this.configService.get<number>('USERS_CLIENT_PORT') as number;
+    return this.configService.get<number>('USERS_CLIENT_PORT', 3002);
   }
 
   usersClientOptions(): ClientOptions {

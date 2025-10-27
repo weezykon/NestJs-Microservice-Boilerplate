@@ -2,10 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { ClientProxy } from '@nestjs/microservices';
+import { BOOKS_CLIENT } from './constant';
 
 @Injectable()
 export class BooksService {
-  constructor(@Inject('BOOKS_CLIENT') private booksClient: ClientProxy) {}
+  constructor(@Inject(BOOKS_CLIENT) private booksClient: ClientProxy) {}
 
   create(createBookDto: CreateBookDto) {
     return this.booksClient.send('books.create', createBookDto);
