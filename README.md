@@ -1,98 +1,366 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Bookstore Microservices
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A microservices-based bookstore application built with NestJS, featuring separate services for users, books, and an API gateway for centralized access.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture Overview
 
-## Description
+This project follows a microservices architecture pattern with the following components:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+┌─────────────────────────────────────────────┐
+│           API Gateway (HTTP)                │
+│           Port: 3001                        │
+└─────────────┬───────────────┬───────────────┘
+              │               │
+              │ TCP           │ TCP
+              │               │
+    ┌─────────▼─────┐   ┌────▼──────────┐
+    │ Users Service │   │ Books Service │
+    │ Port: 3002    │   │ Port: 3003    │
+    │ (TCP)         │   │ (TCP)         │
+    └───────────────┘   └───────────────┘
 ```
 
-## Compile and run the project
+### Components
 
-```bash
-# development
-$ npm run start
+1. **API Gateway** (`apps/bookstore-api-gateway`)
+   - HTTP server that acts as the entry point for all client requests
+   - Routes requests to appropriate microservices
+   - Runs on port 3001
 
-# watch mode
-$ npm run start:dev
+2. **Users Microservice** (`apps/users`)
+   - Handles user-related operations
+   - TCP-based microservice
+   - Runs on port 3002
 
-# production mode
-$ npm run start:prod
+3. **Books Microservice** (`apps/book`)
+   - Manages book inventory and operations
+   - TCP-based microservice
+   - Runs on port 3003
+
+4. **Shared Contracts** (`libs/contracts`)
+   - Shared DTOs and interfaces across services
+
+## Technologies Used
+
+- **Framework**: NestJS 11.x
+- **Runtime**: Node.js
+- **Language**: TypeScript 5.x
+- **Transport**: TCP (for microservices communication)
+- **Package Manager**: npm
+
+## Project Structure
+
+```
+bookstore/
+├── apps/
+│   ├── bookstore-api-gateway/     # HTTP API Gateway
+│   │   └── src/
+│   │       ├── books/             # Books module
+│   │       ├── users/             # Users module
+│   │       ├── client-config/     # Microservice client configuration
+│   │       └── main.ts
+│   ├── book/                      # Books microservice
+│   │   └── src/
+│   │       ├── book.controller.ts
+│   │       ├── book.service.ts
+│   │       └── main.ts
+│   └── users/                     # Users microservice
+│       └── src/
+│           ├── users.controller.ts
+│           ├── users.service.ts
+│           └── main.ts
+├── libs/
+│   └── contracts/                 # Shared contracts/DTOs
+├── .env                          # Environment configuration (not in git)
+├── .env.example                  # Environment template
+└── package.json
 ```
 
-## Run tests
+## Prerequisites
 
+- Node.js (v18 or higher)
+- npm (v9 or higher)
+
+## Installation
+
+1. Clone the repository:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone <repository-url>
+cd bookstore
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+2. Install dependencies:
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
 
-## Resources
+## Environment Configuration
 
-Check out a few resources that may come in handy when working with NestJS:
+The `.env` file contains all port configurations:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```env
+# API Gateway
+API_GATEWAY_PORT=3001
 
-## Support
+# Microservices
+USERS_SERVICE_PORT=3002
+BOOKS_SERVICE_PORT=3003
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Client Ports (used by API Gateway to connect to microservices)
+USERS_CLIENT_PORT=3002
+BOOKS_CLIENT_PORT=3003
+```
 
-## Stay in touch
+You can modify these ports as needed. If no `.env` file is present, the services will use these defaults.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Running the Application
+
+### Development Mode (with watch)
+
+You need to run all three services simultaneously. Open three separate terminal windows:
+
+**Terminal 1 - Users Microservice:**
+```bash
+npm run start users -- --watch
+```
+
+**Terminal 2 - Books Microservice:**
+```bash
+npm run start book -- --watch
+```
+
+**Terminal 3 - API Gateway:**
+```bash
+npm run start bookstore-api-gateway -- --watch
+```
+
+### Production Mode
+
+```bash
+npm run build
+npm run start:prod
+```
+
+### Verify Services are Running
+
+You should see console output indicating each service is running:
+- `Users microservice is listening on port 3002`
+- `Book microservice is listening on port 3003`
+- `API Gateway is running on http://localhost:3001`
+
+## API Endpoints
+
+All requests go through the API Gateway at `http://localhost:3001`
+
+### Users Endpoints
+
+#### Get all users
+```bash
+GET /users
+```
+
+**Example:**
+```bash
+curl http://localhost:3001/users
+```
+
+**Response:**
+```json
+[
+  { "id": 1, "name": "John Doe" },
+  { "id": 2, "name": "Jane Smith" }
+]
+```
+
+### Books Endpoints
+
+#### Get all books
+```bash
+GET /books
+```
+
+**Example:**
+```bash
+curl http://localhost:3001/books
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "rating": 5
+  },
+  {
+    "id": 2,
+    "title": "1984",
+    "author": "George Orwell",
+    "rating": 5
+  }
+]
+```
+
+#### Get a specific book
+```bash
+GET /books/:id
+```
+
+**Example:**
+```bash
+curl http://localhost:3001/books/1
+```
+
+#### Create a new book
+```bash
+POST /books
+Content-Type: application/json
+```
+
+**Example:**
+```bash
+curl -X POST http://localhost:3001/books \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "The Catcher in the Rye",
+    "author": "J.D. Salinger",
+    "rating": 4
+  }'
+```
+
+#### Update a book
+```bash
+PATCH /books/:id
+Content-Type: application/json
+```
+
+**Example:**
+```bash
+curl -X PATCH http://localhost:3001/books/1 \
+  -H "Content-Type: application/json" \
+  -d '{"rating": 5}'
+```
+
+#### Delete a book
+```bash
+DELETE /books/:id
+```
+
+**Example:**
+```bash
+curl -X DELETE http://localhost:3001/books/1
+```
+
+## Testing
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+## Development
+
+### Adding a New Microservice
+
+1. Generate a new NestJS application:
+```bash
+nest generate app <service-name>
+```
+
+2. Configure it as a microservice in `main.ts`:
+```typescript
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+  ServiceModule,
+  {
+    transport: Transport.TCP,
+    options: {
+      port: parseInt(process.env.SERVICE_PORT || '3004', 10),
+    },
+  },
+);
+```
+
+3. Add the service configuration to `.env`:
+```env
+SERVICE_PORT=3004
+SERVICE_CLIENT_PORT=3004
+```
+
+4. Register the client in the API Gateway's `ClientConfigService`
+
+### Project Commands
+
+```bash
+# Build all services
+npm run build
+
+# Format code
+npm run format
+
+# Lint code
+npm run lint
+```
+
+## Architecture Decisions
+
+### Why TCP for Microservices?
+
+- **Performance**: TCP provides fast, reliable communication between services
+- **Simplicity**: No need for message brokers or external dependencies
+- **Internal Communication**: Services are not exposed directly to clients
+
+### Why API Gateway?
+
+- **Single Entry Point**: Clients only need to know one endpoint
+- **Security**: Internal microservices are not directly accessible
+- **Flexibility**: Easy to add authentication, rate limiting, etc.
+- **Service Discovery**: Gateway handles routing to appropriate services
+
+## Troubleshooting
+
+### Port Already in Use
+
+If you get "port already in use" errors:
+
+1. Find and kill the process:
+```bash
+# Find process using port 3001 (or 3002, 3003)
+lsof -ti:3001
+
+# Kill the process
+kill -9 <PID>
+```
+
+2. Or change the port in `.env` file
+
+### Socket Hang Up Error
+
+This usually means:
+- Microservices are not running
+- Wrong port configuration in `.env`
+- Microservice crashed
+
+**Solution**: Ensure all three services (users, book, API gateway) are running
+
+### Module Dependencies Error
+
+If you see "Can't resolve dependencies" errors:
+- Ensure you're using Symbol constants for dependency injection tokens
+- Check that providers are correctly registered in modules
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is [MIT licensed](LICENSE).
