@@ -8,7 +8,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: Number(process.env.port) || 3000,
+        port: 3003,
       },
     },
   );
